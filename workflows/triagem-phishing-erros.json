@@ -1,0 +1,122 @@
+{
+  "name": "Triagem de phishing - erros",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        0
+      ],
+      "id": "5f6e45c3-8422-4fe6-9e7d-3513f7dcff67",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const e = $input.item.json;\nconst exec = e.execution || {};\nconst gatilho = e.trigger || {};\nconst noFalho = exec.lastNodeExecuted\n  || (gatilho.error && gatilho.error.node && gatilho.error.node.name)\n  || 'desconhecido';\n\nreturn {\n  json: {\n    execucao_id: String(exec.id || 'sem_id'),\n    etapa: 'erro_workflow',\n    status: 'erro',\n    duracao_ms: null,\n    erro: 'falha_no_no:' + String(noFalho).slice(0, 60),\n    modelo: null,\n    tokens: null,\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        0
+      ],
+      "id": "dd0babd4-dd5a-435a-9f42-85a7be26e85f",
+      "name": "Montar log de erro"
+    },
+    {
+      "parameters": {
+        "tableId": "execucoes_log",
+        "dataToSend": "autoMapInputData"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        144,
+        0
+      ],
+      "id": "dcab106a-de0c-4ae3-8adb-6d8d5ed26a89",
+      "name": "Gravar log de erro",
+      "credentials": {
+        "supabaseApi": {
+          "id": "PVMxiLmcYWyhwKq1",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "SEU_CHAT_ID",
+        "text": "=FALHA no workflow de triagem de phishing Detalhe: {{ $('Montar log de erro').item.json.erro.replace(/_/g, ' ') }} Execução: {{ $('Montar log de erro').item.json.execucao_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        368,
+        0
+      ],
+      "id": "998e8186-4924-4702-8b27-efd7a8971f74",
+      "name": "Avisar falha",
+      "webhookId": "e4e99bdc-56cb-474b-a71a-72d1bf2f9c0a",
+      "credentials": {
+        "telegramApi": {
+          "id": "j2Wc1FJfUpqriymk",
+          "name": "Telegram - Bot Phishing"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Montar log de erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Montar log de erro": {
+      "main": [
+        [
+          {
+            "node": "Gravar log de erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gravar log de erro": {
+      "main": [
+        [
+          {
+            "node": "Avisar falha",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "0d0a4f0b-33d3-4b86-b941-150c9c6c6fc5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c017a3d74bb977e32dd8725023b09a51011d1b4e2a166827224f8638e7db98c8"
+  },
+  "nodeGroups": [],
+  "id": "w6UMSoTpdiThRf0I",
+  "tags": []
+}
