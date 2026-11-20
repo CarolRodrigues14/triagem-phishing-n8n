@@ -4,7 +4,7 @@ Automação em **n8n** que recebe e-mails reportados por colaboradores de uma em
 
 Projeto da disciplina Automação de Processos e Workflows (UniFECAF). Todos os dados de teste são fictícios.
 
-Vídeo pitch: `COLE_AQUI_O_LINK`
+Vídeo pitch: `[https://youtu.be/RkfwzAt52IE]`
 
 ## Problema
 
